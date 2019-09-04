@@ -31,15 +31,23 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
         }
 
         if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                if (is_array($value) || is_object($value)) {
-                    $data[$key] = new self($value);
-                }
-            }
+            $this->transformArrayValues($data);
         }
 
         if (is_array($data)) {
           $this->data = $data;
+        }
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function transformArrayValues(&$values)
+    {
+        foreach ($values as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                $values[$key] = new self($value);
+            }
         }
     }
 
@@ -239,6 +247,8 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
 
     public function push(...$values)
     {
+        $this->transformArrayValues($values);
+        
         array_push($this->data, ...$values);
 
         return $this;
@@ -251,6 +261,8 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
 
     public function unshift(...$values)
     {
+        $this->transformArrayValues($values);
+
         array_unshift($this->data, ...$values);
 
         return $this;
