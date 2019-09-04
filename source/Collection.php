@@ -232,6 +232,66 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
         return new self(array_values($this->data));
     }
 
+    public function contains(...$arguments)
+    {
+        $count = count($arguments);
+        $callback = null;
+
+        if ($count === 0) {
+            return false;
+        }
+
+        switch ($count) {
+            case 1 && is_callable($arguments[0]):
+                $callback = $arguments[0];
+                break;
+            case 1:
+                $callback = function ($value, $comparator) {
+                    return $value === $comparator;
+                };
+                break;
+            default:
+                $callback = function ($value, $key, $comparisonValue, $comparisonKey) {
+                    return $key === $comparisonKey &&
+                        $value === $comparisonValue;
+                };
+                break;
+        }
+
+        foreach ($this->data as $key => $value) {
+            if ($value instanceof self) {
+                $value = $value->toArray();
+            }
+
+            $args = [];
+
+            switch ($count) {
+                case 1 && is_callable($arguments[0]):
+                    $args = [$value, $key];
+                    break;
+                case 1:
+                    $args = [$arguments[0], $value];
+                    break;
+                case 2:
+                    $args = [$arguments[1], $arguments[0], $value, $key];
+                    break;
+            }
+
+            $result = $callback(...$args);
+
+            if ($result) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function some(...$values)
+    {
+        return $this->contains($values);
+    }
+
     public static function __set_state($exported)
     {
         return new static($exported["data"]);

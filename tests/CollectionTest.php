@@ -478,4 +478,62 @@ class CollectionTest extends TestCase
 
         $this->assertEquals($expected, $evaluated->toArray());
     }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::contains
+     */
+    public function can_get_presence_of_value()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $this->assertTrue($collection->contains(2));
+    }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::contains
+     */
+    public function can_get_presence_of_key_value_pair()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $this->assertNotTrue($collection->contains('four', 4));
+    }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::contains
+     */
+    public function can_get_presence_with_callback()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $this->assertTrue($collection->contains(function ($value, $key) {
+            return $value > 1 && $value < 3;
+        }));
+    }
+
+    public function can_get_presence_with_alias_method()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $this->assertTrue($collection->some(3));
+    }
 }
