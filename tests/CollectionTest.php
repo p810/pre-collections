@@ -478,4 +478,98 @@ class CollectionTest extends TestCase
 
         $this->assertEquals($expected, $evaluated->toArray());
     }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::pop
+     */
+    public function can_pop_data()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $expectedValue = 3;
+        $expectedShape = [
+            'one' => 1,
+            'two' => 2
+        ];
+
+        $this->assertEquals($expectedValue, $collection->pop());
+        $this->assertEquals($expectedShape, $collection->toArray());
+    }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::push
+     */
+    public function can_push_data()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $expected = [
+            'one' => 1,
+            'two' => 2,
+            'three' => 3,
+            0 => 4,
+            1 => 5
+        ];
+
+        $collection->push(4, 5);
+
+        $this->assertEquals($expected, $collection->toArray());
+    }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::shift
+     */
+    public function can_shift_data()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $expectedValue = 1;
+        $expectedShape = [
+            'two' => 2,
+            'three' => 3
+        ];
+
+        $this->assertEquals($expectedValue, $collection->shift());
+        $this->assertEquals($expectedShape, $collection->toArray());
+    }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::unshift
+     */
+    public function can_unshift_data()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $expected = [
+            0 => 4,
+            1 => 5,
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ];
+
+        $collection->unshift(4, 5);
+
+        $this->assertEquals($expected, $collection->toArray());
+    }
 }

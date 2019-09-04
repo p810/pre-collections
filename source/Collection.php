@@ -232,6 +232,30 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
         return new self(array_values($this->data));
     }
 
+    public function pop()
+    {
+        return array_pop($this->data);
+    }
+
+    public function push(...$values)
+    {
+        array_push($this->data, ...$values);
+
+        return $this;
+    }
+
+    public function shift()
+    {
+        return array_shift($this->data);
+    }
+
+    public function unshift(...$values)
+    {
+        array_unshift($this->data, ...$values);
+
+        return $this;
+    }
+
     public static function __set_state($exported)
     {
         return new static($exported["data"]);
