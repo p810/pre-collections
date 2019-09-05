@@ -234,28 +234,29 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
 
     public function contains(...$arguments)
     {
-        $count = count($arguments);
         $callback = null;
+        $callbackArgs = [];
+        $count = count($arguments);
 
         if ($count === 0) {
             return false;
-        }
-
-        switch ($count) {
-            case 1 && is_callable($arguments[0]):
+        } elseif ($count === 1) {
+            if (is_callable($arguments[0])) {
                 $callback = $arguments[0];
-                break;
-            case 1:
+            } else {
                 $callback = function ($value, $comparator) {
                     return $value === $comparator;
                 };
-                break;
-            default:
-                $callback = function ($value, $key, $comparisonValue, $comparisonKey) {
-                    return $key === $comparisonKey &&
-                        $value === $comparisonValue;
-                };
-                break;
+
+                $callbackArgs[] = $arguments[0];
+            }
+        } elseif ($count >= 2) {
+            $callback = function ($value, $key, $comparisonValue, $comparisonKey) {
+                return $key === $comparisonKey &&
+                    $value === $comparisonValue;
+            };
+
+            array_push($callbackArgs, $arguments[1], $arguments[0]);
         }
 
         foreach ($this->data as $key => $value) {
@@ -263,23 +264,9 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
                 $value = $value->toArray();
             }
 
-            $args = [];
+            $args = array_merge($callbackArgs, [$value, $key]);
 
-            switch ($count) {
-                case 1 && is_callable($arguments[0]):
-                    $args = [$value, $key];
-                    break;
-                case 1:
-                    $args = [$arguments[0], $value];
-                    break;
-                case 2:
-                    $args = [$arguments[1], $arguments[0], $value, $key];
-                    break;
-            }
-
-            $result = $callback(...$args);
-
-            if ($result) {
+            if ($callback(...$args)) {
                 return true;
             }
         }
