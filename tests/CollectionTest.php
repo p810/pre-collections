@@ -526,6 +526,23 @@ class CollectionTest extends TestCase
         }));
     }
 
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::contains
+     */
+    public function test_can_get_presence_with_callback_argument_omitted()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $this->assertTrue($collection->contains(function ($value) {
+            return $value === 2;
+        }));
+    }
+
     public function can_get_presence_with_alias_method()
     {
         $collection = new Collection([
