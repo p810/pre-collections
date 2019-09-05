@@ -252,8 +252,7 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
             }
         } elseif ($count >= 2) {
             $callback = function ($value, $key, $comparisonValue, $comparisonKey) {
-                return $key === $comparisonKey &&
-                    $value === $comparisonValue;
+                return $key === $comparisonKey && $value === $comparisonValue;
             };
 
             array_push($callbackArgs, $arguments[1], $arguments[0]);
