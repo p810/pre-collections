@@ -543,6 +543,10 @@ class CollectionTest extends TestCase
         }));
     }
 
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::some
+     */
     public function can_get_presence_with_alias_method()
     {
         $collection = new Collection([
@@ -552,5 +556,23 @@ class CollectionTest extends TestCase
         ]);
 
         $this->assertTrue($collection->some(3));
+    }
+
+    /**
+     * @test
+     * @covers Pre\Collections\Collection::contains
+     */
+    public function can_throw_with_invalid_arguments()
+    {
+        $collection = new Collection([
+            'one' => 1,
+            'two' => 2,
+            'three' => 3
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Collection::contains() expects a value, value and key, or callback');
+
+        $collection->contains();
     }
 }

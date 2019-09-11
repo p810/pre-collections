@@ -11,6 +11,8 @@ use Iterator;
 use IteratorAggregate;
 use Serializable;
 use stdClass;
+use BadMethodCallException;
+use InvalidArgumentsException;
 
 final class Collection implements ArrayAccess, Countable, IteratorAggregate, Serializable
 {
@@ -234,28 +236,20 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
 
     public function contains(...$arguments)
     {
-        $callback = null;
-        $callbackArgs = [];
         $count = count($arguments);
 
-        if ($count === 0) {
-            return false;
+        if ($count === 1 && is_callable($arguments[0])) {
+            $callback = array_shift($arguments);
         } elseif ($count === 1) {
-            if (is_callable($arguments[0])) {
-                $callback = $arguments[0];
-            } else {
-                $callback = function ($value, $comparator) {
-                    return $value === $comparator;
-                };
-
-                $callbackArgs[] = $arguments[0];
-            }
-        } elseif ($count >= 2) {
-            $callback = function ($value, $key, $comparisonValue, $comparisonKey) {
-                return $key === $comparisonKey && $value === $comparisonValue;
+            $callback = function ($expected, $value) {
+                return $expected === $value;
             };
-
-            array_push($callbackArgs, $arguments[1], $arguments[0]);
+        } elseif ($count >= 2) {
+            $callback = function ($expectedValue, $expectedKey, $value, $key) {
+                return $expectedValue === $value && $expectedKey === $key;
+            };
+        } else {
+            throw new InvalidArgumentException('Collection::contains() expects a value, value and key, or callback');
         }
 
         foreach ($this->data as $key => $value) {
@@ -263,7 +257,7 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
                 $value = $value->toArray();
             }
 
-            $args = array_merge($callbackArgs, [$value, $key]);
+            $args = array_merge($arguments, [$value, $key]);
 
             if ($callback(...$args)) {
                 return true;
@@ -275,7 +269,7 @@ final class Collection implements ArrayAccess, Countable, IteratorAggregate, Ser
 
     public function some(...$values)
     {
-        return $this->contains($values);
+        return $this->contains(...$values);
     }
 
     public static function __set_state($exported)
